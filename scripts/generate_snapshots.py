@@ -122,10 +122,8 @@ class SnapshotGenerator:
                     categories=country.supported_categories,
                     language="en_US",
                 ),
-                f"{snapshot_path}/"
-                f"{country_code}.json",
+                f"{snapshot_path}/{country_code}.json",
             )
-
 
     def generate_financial_snapshots(self):
         """Generates financial snapshots."""
