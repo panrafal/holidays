@@ -1,3 +1,21 @@
+### Local fork update
+
+This is a local fork to create and host snapshots of only national holidays.
+
+To prepare:
+
+```
+virtualenv -p python3 venv
+source venv/bin/activate
+make setup
+```
+
+To generate snapshots:
+```
+source venv/bin/activate
+scripts/generate_snapshots.py
+```
+
 ========
 holidays
 ========

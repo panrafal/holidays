@@ -98,6 +98,35 @@ class SnapshotGenerator:
                     f"{country_code}_{(subdiv or 'COMMON').replace(' ', '_').upper()}.json",
                 )
 
+    def generate_national_snapshots(self):
+        """Generates national snapshots."""
+        if self.args.market:
+            return None
+
+        supported_countries = list_supported_countries(include_aliases=False)
+        country_list = self.args.country or supported_countries
+        if unknown_countries := set(country_list).difference(supported_countries.keys()):
+            raise ValueError(f"Countries {', '.join(unknown_countries)} not available")
+
+        snapshot_path = "snapshots/national"
+        if not self.args.country:
+            self.prepare_snapshot_directory(snapshot_path)
+        for country_code in country_list:
+            country = getattr(holidays, country_code)
+
+            self.save(
+                holidays.country_holidays(
+                    country_code,
+                    subdiv=None,
+                    years=self.years,
+                    categories=country.supported_categories,
+                    language="en_US",
+                ),
+                f"{snapshot_path}/"
+                f"{country_code}.json",
+            )
+
+
     def generate_financial_snapshots(self):
         """Generates financial snapshots."""
         if self.args.country:
@@ -124,6 +153,7 @@ class SnapshotGenerator:
     def run(self):
         """Runs snapshot files generation process."""
         self.generate_country_snapshots()
+        self.generate_national_snapshots()
         self.generate_financial_snapshots()
 
 
