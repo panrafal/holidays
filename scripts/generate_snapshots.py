@@ -23,6 +23,7 @@ sys.path.append(f"{Path.cwd()}")  # Make holidays visible.
 
 import holidays  # noqa: E402
 from holidays import list_supported_countries, list_supported_financial  # noqa: E402
+from holidays.constants import PUBLIC  # noqa: E402
 
 
 class SnapshotGenerator:
@@ -103,6 +104,7 @@ class SnapshotGenerator:
         if self.args.market:
             return None
 
+        allowed_categories = [PUBLIC]
         supported_countries = list_supported_countries(include_aliases=False)
         country_list = self.args.country or supported_countries
         if unknown_countries := set(country_list).difference(supported_countries.keys()):
@@ -119,7 +121,9 @@ class SnapshotGenerator:
                     country_code,
                     subdiv=None,
                     years=self.years,
-                    categories=country.supported_categories,
+                    categories=list(
+                        set(country.supported_categories).intersection(allowed_categories)
+                    ),
                     language="en_US",
                 ),
                 f"{snapshot_path}/{country_code}.json",
@@ -130,6 +134,7 @@ class SnapshotGenerator:
         if self.args.country:
             return None
 
+        allowed_categories = [PUBLIC]
         supported_markets = list_supported_financial(include_aliases=False)
         market_list = self.args.market or supported_markets
         if unknown_markets := set(market_list).difference(supported_markets.keys()):
@@ -143,6 +148,7 @@ class SnapshotGenerator:
                 holidays.country_holidays(
                     market_code,
                     years=self.years,
+                    categories=allowed_categories,
                     language="en_US",
                 ),
                 f"{snapshot_path}/{market_code}.json",
